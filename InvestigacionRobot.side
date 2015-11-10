@@ -1,0 +1,140 @@
+# Investigaci-n-Robot
+
+/*
+Algoritmos y Estructura de Datos
+Investigacion: Robot en un laberinto
+
+Creado por:
+	Juan Luis García 14189
+	Ricardo Galindo 14225
+	Miguel Godoy Garin 14425
+	Daniel Smith 14089
+
+	10/11/2015
+	
+Blank Simple Project.c
+http://learn.parallax.com/propeller-c-tutorials
+*/
+
+#include "simpletools.h"
+#include "ping.h"
+#include "abdrive.h"
+#include "abcalibrate.h"
+
+int irLeft;
+int irRight;
+int ojos;
+
+struct stack{
+int stk[1000];
+int top;
+};
+
+typedef struct stack ST;
+ST s;
+
+void push(int);
+int pop(void);
+
+int main(){ // main function
+low(26); // D/A0 & D/A1 to 0 V
+low(27);
+s.top = 0;
+int movimiento = 0;
+int mov;
+
+while(1){
+freqout(11, 1, 38000); // Left IR LED light
+irLeft = input(10); // Check left IR detector
+
+freqout(1, 1, 38000); // Repeat for right detector
+irRight = input(2);
+ojos = ping_cm(8); //Sensor
+//irRight y irLeft == 0 -> Detecta una pared
+//movimiento = 1 -> avanza hacia adelante
+//movimiento = 2 -> gira a la derecha
+//movimiento = 3 -> gira a la izquierda
+//movimiento = 4 -> Regresa
+/*if((irRight == 0) && (ojos >= 8)){
+push(1);
+}
+if((irRight == 1) && (ojos < 8)){
+push(2);
+}
+if((irRight == 0) && (ojos < 8)){
+push(3);
+}
+if((irRight == 0) && (ojos < 8) && (irLeft == 0)){
+push(4);
+}
+if(irRight == 1){
+push(5);
+} */
+if((ojos >= 8) && (irRight == 0)){
+Avanzar(ojos);
+}
+if((ojos < 8) && (irRight == 0)){
+Izquierda(25);
+}
+if(/*(ojos < 8) && */(irRight == 1)){
+Derecha(4);
+movimiento = movimiento + 1;
+}
+/*if(irRight == 1){
+Avanzar(15);
+Derecha(25);
+if(ojos >= 8 && irRight == 1){
+Avanzar(30);
+}
+}*/
+//movimiento = pop();
+//Se analiza la siguiente posibilidad de movimiento
+/*****Avanza hacia adelante*****/
+/*if(movimiento == 1){
+Avanzar(ojos);
+}
+/*****Gira hacia la derecha*****/
+/*while(movimiento == 2){ //utiliza un while para que termine de girar hasta que encuentre un obstaculo
+Derecha(4);
+}
+/*****Gira hacia la izquierda*****/
+/*while(movimiento == 3){
+Izquierda(4);
+}
+if(movimiento == 4){
+Izquierda(25);
+Izquierda(25);
+}
+if(movimiento == 5){
+Avanzar(2.5);
+Derecha(4);
+if(ojos >= 8 && irRight == 1){
+Avanzar(30);
+}
+} */
+ojos = ojos/0.325;
+}
+}
+
+void Avanzar(int a){
+drive_goto(a, a);
+pause(100);
+}
+void Izquierda(int i){
+drive_goto(-i, i+1);
+pause(100);
+}
+void Derecha(int d){
+drive_goto(d,-1);
+pause(100);
+}
+
+void push(int a){
+s.top += 1;
+s.stk[s.top] = a;
+}
+int pop(){
+int a = s.stk[s.top];
+s.top -= 1;
+return a;
+}
